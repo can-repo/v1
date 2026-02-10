@@ -1,0 +1,386 @@
+/* ============================================
+   TELEGRAM THEME CSS VARIABLES & GLOBAL STYLES
+   ============================================ 
+   
+   Telegram injects --tg-theme-* variables automatically via SDK.
+   Fallback values use CSS custom properties with system preference detection.
+*/
+
+/* ============================================
+   FALLBACK THEME VARIABLES (when not in Telegram)
+   ============================================ */
+:root {
+  /* Light Theme Defaults */
+  --fallback-bg-color: #ffffff;
+  --fallback-text-color: #000000;
+  --fallback-hint-color: #8e8e93;
+  --fallback-link-color: #3390ec;
+  --fallback-button-color: #3390ec;
+  --fallback-button-text-color: #ffffff;
+  --fallback-secondary-bg-color: #f2f2f7;
+  --fallback-separator-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme Fallbacks */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fallback-bg-color: #1c1c1e;
+    --fallback-text-color: #ffffff;
+    --fallback-hint-color: #8e8e93;
+    --fallback-link-color: #3390ec;
+    --fallback-button-color: #3390ec;
+    --fallback-button-text-color: #ffffff;
+    --fallback-secondary-bg-color: #2c2c2e;
+    --fallback-separator-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* ============================================
+   BASE APP STYLES
+   ============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* Prevent text size adjustment on orientation change */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Use full viewport */
+  height: 100%;
+  height: -webkit-fill-available;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--tg-theme-bg-color, var(--fallback-bg-color));
+  color: var(--tg-theme-text-color, var(--fallback-text-color));
+  transition: background-color 0.2s ease, color 0.2s ease;
+  /* Full height layout */
+  min-height: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  /* Prevent horizontal scroll */
+  overflow-x: hidden;
+  /* Prevent rubber-band scrolling on iOS */
+  overscroll-behavior: none;
+  /* Prevent text selection on double-tap */
+  -webkit-user-select: none;
+  user-select: none;
+  /* Prevent touch callout on iOS */
+  -webkit-touch-callout: none;
+  /* Prevent tap highlight */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Allow text selection in inputs */
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+#app {
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================
+   REUSABLE UTILITY CLASSES
+   ============================================ */
+
+/* Page Container - Flex layout for sticky footer */
+.tg-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tg-theme-bg-color, var(--fallback-bg-color));
+  color: var(--tg-theme-text-color, var(--fallback-text-color));
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Page Content - Grows to push footer down */
+.tg-page-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Sticky Footer Actions */
+.tg-footer-actions {
+  position: sticky;
+  bottom: 0;
+  padding: 16px;
+  background-color: var(--tg-theme-bg-color, var(--fallback-bg-color));
+  border-top: 1px solid var(--fallback-separator-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* Safe area for notch devices */
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Typography */
+.tg-title-large {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.tg-title-medium {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.tg-title-small {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.tg-body {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.tg-caption {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color, var(--fallback-hint-color));
+}
+
+.tg-link {
+  color: var(--tg-theme-link-color, var(--fallback-link-color));
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tg-link:hover {
+  opacity: 0.8;
+}
+
+/* Layout Utilities */
+.tg-container {
+  padding: 16px;
+}
+
+.tg-section {
+  margin-bottom: 24px;
+}
+
+.tg-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ============================================
+   REUSABLE COMPONENTS
+   ============================================ */
+
+/* List Group - Common list container */
+.tg-list-group {
+  margin: 0 16px;
+  background-color: var(--tg-theme-secondary-bg-color, var(--fallback-secondary-bg-color));
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* List Item - Clickable item in list */
+.tg-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--fallback-separator-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tg-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tg-list-item:last-child {
+  border-bottom: none;
+}
+
+/* List Item Content */
+.tg-item-content {
+  flex: 1;
+}
+
+.tg-item-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color, var(--fallback-text-color));
+  margin: 0;
+}
+
+.tg-item-subtitle {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color, var(--fallback-hint-color));
+  margin: 0;
+}
+
+/* Item Arrow Indicator */
+.tg-item-arrow {
+  color: var(--tg-theme-hint-color, var(--fallback-hint-color));
+  opacity: 0.5;
+  margin-left: 8px;
+}
+
+/* Search Bar */
+.tg-search-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--tg-theme-secondary-bg-color, var(--fallback-secondary-bg-color));
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.tg-search-icon {
+  color: var(--tg-theme-hint-color, var(--fallback-hint-color));
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.tg-search-input {
+  background: none;
+  border: none;
+  color: var(--tg-theme-text-color, var(--fallback-text-color));
+  font-size: 17px;
+  width: 100%;
+  outline: none;
+  font-family: inherit;
+}
+
+.tg-search-input::placeholder {
+  color: var(--tg-theme-hint-color, var(--fallback-hint-color));
+}
+
+/* Buttons */
+.tg-button {
+  padding: 12px 24px;
+  background-color: var(--tg-theme-button-color, var(--fallback-button-color));
+  color: var(--tg-theme-button-text-color, var(--fallback-button-text-color));
+  border: none;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: inherit;
+}
+
+.tg-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.tg-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tg-button-secondary {
+  background-color: var(--tg-theme-secondary-bg-color, var(--fallback-secondary-bg-color));
+  color: var(--tg-theme-text-color, var(--fallback-text-color));
+}
+
+/* Avatar */
+.tg-avatar {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.tg-avatar-small {
+  width: 40px;
+  height: 40px;
+}
+
+.tg-avatar-medium {
+  width: 60px;
+  height: 60px;
+}
+
+.tg-avatar-large {
+  width: 80px;
+  height: 80px;
+}
+
+.tg-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Section Header */
+.tg-section-header {
+  padding: 8px 16px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tg-theme-text-color, var(--fallback-text-color));
+}
+
+/* Icon Container */
+.tg-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Spacing Utilities */
+.tg-spacing-xs {
+  padding: 4px;
+}
+
+.tg-spacing-sm {
+  padding: 8px;
+}
+
+.tg-spacing-md {
+  padding: 16px;
+}
+
+.tg-spacing-lg {
+  padding: 24px;
+}
+
+.tg-spacing-xl {
+  padding: 32px;
+}
+
+.tg-margin-bottom-sm {
+  margin-bottom: 8px;
+}
+
+.tg-margin-bottom-md {
+  margin-bottom: 16px;
+}
+
+.tg-margin-bottom-lg {
+  margin-bottom: 24px;
+}
+
+/* (Dark theme is handled by fallback system above) */
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+@media (max-width: 375px) {
+  .tg-title-large {
+    font-size: 24px;
+  }
+
+  .tg-title-medium {
+    font-size: 18px;
+  }
+}

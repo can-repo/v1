@@ -1,393 +1,348 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { miniApp, viewport, backButton } from "@tma.js/sdk-vue";
+import { viewport } from "@tma.js/sdk-vue";
+import { useRouter } from "vue-router";
+import type { AppMenuItem } from "@/types";
 
-// Page state
-const selectedItems = ref<string[]>([]);
-const isLoading = ref(false);
+const router = useRouter();
 
-// Lifecycle
+// State
+const searchQuery = ref("");
+
+// Mock Data for "My app"
+const apps = ref<AppMenuItem[]>([
+  {
+    code: "RA",
+    name: "Room Attendant",
+    description: "Room Attendant Mini App",
+  },
+  {
+    code: "POS",
+    name: "Point-of-sale Order",
+    description: "Point-of-sale Order Mini App",
+  },
+]);
+
+// Methods
+const handleCreateApp = () => {
+  console.log("Create new app clicked");
+};
+
+const handleAppClick = (app: AppMenuItem) => {
+  console.log("Clicked app:", app.name);
+  if (app.code === "RA") {
+    goToRAStatus();
+  }
+};
+
 onMounted(() => {
-  // Expand viewport
   if (viewport.mount.isAvailable()) {
     viewport.mount();
     viewport.expand();
   }
-
-  // Setup back button
-  if (backButton.mount.isAvailable()) {
-    backButton.mount();
-    backButton.show();
-    backButton.onClick(() => {
-      // Handle back navigation
-      console.log("Back button clicked");
-    });
-  }
 });
 
-// Methods
-const handleAddItem = () => {
-  console.log("Add item clicked");
-  // TODO: Implement add item logic
+const goToHome = () => {
+  router.push("/");
 };
 
-const handleRemoveItem = (item: string) => {
-  selectedItems.value = selectedItems.value.filter((i) => i !== item);
-};
-
-const handlePrimaryAction = () => {
-  console.log("Primary action clicked");
-  // TODO: Implement primary action
+const goToRAStatus = () => {
+  router.push("/Status");
 };
 </script>
 
 <template>
-  <div class="main-menu">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-title">
-        <h1></h1>
-        <span class="subtitle"></span>
+  <div class="tg-page">
+    <!-- Fixed Header Section -->
+    <div class="header-section">
+      <div class="avatar-container">
+        <img
+          src="@/assets/icons/PowerProLogo.png"
+          alt="PowerPro"
+          class="avatar-img"
+        />
       </div>
-
-      <button class="info-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24">
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          />
-          <path
-            d="M12 16v-4m0-4h.01"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-        </svg>
-      </button>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="icon-container">
-        <!-- Replace with your icon/image -->
-        <div class="placeholder-icon">
-          <img
-            src="@/assets/icons/Power Pro Logo.png"
-            alt="Power Pro Logo "
-            style="width: 120px; height: 120px; background-color: transparent"
-          />
-        </div>
-      </div>
-
-      <h2 class="hero-title">Power Pro Mini App</h2>
-      <p class="hero-subtitle">
-        Welcome to Power Pro Mini App, please select your menu.
-        <a href="#" class="learn-more">Learn More ›</a>
+      <h1 class="page-title">Power Pro Mini App</h1>
+      <p class="page-description">
+        Power Pro Mini App is the one app to rule them all
+        <a href="#" class="link">Learn more ></a>
       </p>
-    </section>
+    </div>
 
-    <!-- Items Section -->
-    <section class="items-section">
-      <div class="section-header">
-        <span class="section-title">Menu</span>
+    <!-- Fixed Search Section -->
+    <div class="search-container">
+      <div class="search-bar">
+        <svg
+          class="search-icon"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search"
+          class="search-input"
+        />
       </div>
+    </div>
 
-      <!-- Item List -->
-      <div class="item-list">
-        <!-- Item 1 -->
-        <div class="item">
-          <div class="item-icon">
-            <span class="icon-placeholder">⚙️</span>
+    <!-- Fixed Section Title -->
+    <div class="section-title">My Apps</div>
+
+    <!-- Scrollable List (only this part scrolls) -->
+    <div class="list-scroll-container">
+      <div class="list-group">
+        <!-- Create New App Action -->
+        <div class="list-item clickable" @click="handleCreateApp">
+          <div class="item-icon-container">
+            <svg
+              class="plus-icon"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
           </div>
           <div class="item-content">
-            <h3 class="item-title">Room Attendant</h3>
-            <p class="item-description">Room attendant menu</p>
+            <div class="item-title action-text">Register New App</div>
           </div>
-          <button class="item-remove" @click="handleRemoveItem('item1')">
-            🗑️
-          </button>
         </div>
 
-        <!-- Item 2 -->
-        <div class="item">
-          <div class="item-icon">
-            <span class="icon-placeholder">🔋</span>
-          </div>
+        <!-- Existing Apps List -->
+        <div
+          v-for="app in apps"
+          :key="app.code"
+          class="list-item clickable"
+          @click="handleAppClick(app)"
+        >
           <div class="item-content">
-            <h3 class="item-title">Another Item</h3>
-            <p class="item-description">Another description</p>
+            <div class="item-title">{{ app.name }}</div>
+            <div class="item-subtitle">{{ app.description }}</div>
           </div>
-          <button class="item-remove" @click="handleRemoveItem('item2')">
-            🗑️
-          </button>
+          <div class="item-arrow">
+            <svg
+              width="8"
+              height="14"
+              viewBox="0 0 8 14"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M1 13L7 7L1 1"></path>
+            </svg>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Add More Button -->
-      <button class="add-more-btn" @click="handleAddItem">
-        <span class="plus-icon">+</span>
-        Add More
-      </button>
-    </section>
-
-    <!-- Bottom Actions -->
-    <div class="bottom-actions">
-      <button
-        class="primary-btn"
-        @click="handlePrimaryAction"
-        :disabled="isLoading"
-      >
-        {{ isLoading ? "Loading..." : "Primary Action" }}
-      </button>
+    <!-- Fixed Footer Actions -->
+    <div class="tg-footer-actions">
+      <button @click="goToHome" class="tg-button">Back to Home</button>
     </div>
   </div>
 </template>
 
 <style scoped>
-.main-menu {
-  min-height: 100vh;
-  background: var(--tg-theme-bg-color, #ffffff);
-  color: var(--tg-theme-text-color, #000000);
-  padding-bottom: 80px;
-}
-
-/* Header */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px;
-  border-bottom: 1px solid var(--tg-theme-hint-color, #e5e5e5);
-}
-
-.cancel-btn,
-.info-btn {
-  background: none;
-  border: none;
-  color: var(--tg-theme-link-color, #007aff);
-  font-size: 16px;
-  cursor: pointer;
-  padding: 8px;
-}
-
-.header-title {
+/* Header Section - Fixed at top */
+.header-section {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-}
-
-.header-title h1 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.subtitle {
-  font-size: 12px;
-  color: var(--tg-theme-hint-color, #999);
-}
-
-/* Hero Section */
-.hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 32px 24px;
+  padding: 20px 16px 12px;
   text-align: center;
+  background-color: var(--tg-theme-bg-color, var(--fallback-bg-color));
 }
 
-.icon-container {
-  margin-bottom: 24px;
+/* Search Section - Fixed */
+.search-container {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  background-color: var(--tg-theme-bg-color, var(--fallback-bg-color));
 }
 
-.placeholder-icon {
-  font-size: 80px;
-  width: 120px;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--tg-theme-secondary-bg-color, #f5f5f5);
-  border-radius: 24px;
+/* Section Title - Fixed */
+.section-title {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tg-theme-text-color, var(--fallback-text-color));
+  background-color: var(--tg-theme-bg-color, var(--fallback-bg-color));
 }
 
-.hero-title {
+/* Scrollable List Container */
+.list-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Only show scrollbar when needed */
+  overscroll-behavior: contain;
+  padding: 0 16px 16px;
+}
+
+.avatar-container {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--tg-theme-secondary-bg-color, #2c2c2e);
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.page-title {
   margin: 0 0 8px 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--tg-theme-text-color, #000);
+  font-size: 28px;
+  font-weight: 700;
 }
 
-.hero-subtitle {
+.page-description {
   margin: 0;
   font-size: 15px;
-  color: var(--tg-theme-hint-color, #999);
+  line-height: 1.4;
+  color: var(--tg-theme-hint-color, #8e8e93);
+  max-width: 320px;
 }
 
-.learn-more {
-  color: var(--tg-theme-link-color, #007aff);
+.link {
+  color: var(--tg-theme-link-color, #3390ec);
   text-decoration: none;
-  font-weight: 500;
+  cursor: pointer;
 }
 
-/* Items Section */
-.items-section {
-  padding: 0 16px;
-  margin-bottom: 24px;
+/* Search Section */
+.search-container {
+  padding: 8px 16px;
+  margin-bottom: 16px;
 }
 
-.section-header {
-  padding: 16px 0 8px;
-}
-
-.section-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--tg-theme-hint-color, #999);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.item-list {
-  background: var(--tg-theme-secondary-bg-color, #f5f5f5);
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-
-.item {
+.search-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: var(--tg-theme-bg-color, #fff);
-  border-bottom: 1px solid var(--tg-theme-secondary-bg-color, #f5f5f5);
+  background-color: var(--tg-theme-secondary-bg-color, #2c2c2e);
+  border-radius: 12px;
+  padding: 8px 12px;
 }
 
-.item:last-child {
+.search-icon {
+  color: var(--tg-theme-hint-color, #8e8e93);
+  margin-right: 8px;
+}
+
+.search-input {
+  background: none;
+  border: none;
+  color: var(--tg-theme-text-color, #fff);
+  font-size: 17px;
+  width: 100%;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--tg-theme-hint-color, #8e8e93);
+}
+
+/* Section Title */
+.section-title {
+  padding: 8px 16px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tg-theme-text-color, #fff);
+}
+
+/* List Group - inside scroll container so no margin needed */
+.list-group {
+  background-color: var(
+    --tg-theme-secondary-bg-color,
+    var(--fallback-secondary-bg-color)
+  );
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.list-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.list-item:last-child {
   border-bottom: none;
 }
 
-.item-icon {
+/* Action Item - Page specific */
+.item-icon-container {
   width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: var(--tg-theme-secondary-bg-color, #f5f5f5);
   display: flex;
-  align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  margin-right: 12px;
 }
 
-.icon-placeholder {
-  font-size: 24px;
+.plus-icon {
+  color: var(--tg-theme-link-color, #3390ec);
 }
 
+.action-text {
+  color: var(--tg-theme-link-color, #3390ec) !important;
+}
+
+/* Item Content */
 .item-content {
   flex: 1;
 }
 
 .item-title {
-  margin: 0 0 4px 0;
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--tg-theme-text-color, #000);
-}
-
-.item-description {
-  margin: 0;
-  font-size: 14px;
-  color: var(--tg-theme-hint-color, #999);
-}
-
-.item-remove {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 4px;
-  opacity: 0.6;
-  transition: opacity 0.2s;
-}
-
-.item-remove:hover {
-  opacity: 1;
-}
-
-.add-more-btn {
-  width: 100%;
-  padding: 12px;
-  background: var(--tg-theme-bg-color, #fff);
-  border: 2px dashed var(--tg-theme-hint-color, #ccc);
-  border-radius: 12px;
-  color: var(--tg-theme-link-color, #007aff);
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s;
-}
-
-.add-more-btn:hover {
-  background: var(--tg-theme-secondary-bg-color, #f5f5f5);
-}
-
-.plus-icon {
-  font-size: 20px;
-  font-weight: 300;
-}
-
-/* Bottom Actions */
-.bottom-actions {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 16px;
-  background: var(--tg-theme-bg-color, #fff);
-  border-top: 1px solid var(--tg-theme-hint-color, #e5e5e5);
-}
-
-.primary-btn {
-  width: 100%;
-  padding: 16px;
-  background: var(--tg-theme-button-color, #007aff);
-  color: var(--tg-theme-button-text-color, #fff);
-  border: none;
-  border-radius: 12px;
   font-size: 17px;
   font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
+  color: var(--tg-theme-text-color, #fff);
 }
 
-.primary-btn:hover:not(:disabled) {
-  opacity: 0.9;
+.item-subtitle {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color, #8e8e93);
 }
 
-.primary-btn:disabled {
+.item-arrow {
+  color: var(--tg-theme-hint-color, #8e8e93);
   opacity: 0.5;
-  cursor: not-allowed;
 }
-
-/* Responsive */
-@media (max-width: 375px) {
-  .hero-title {
-    font-size: 20px;
-  }
-
-  .placeholder-icon {
-    font-size: 60px;
-    width: 100px;
-    height: 100px;
-  }
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 </style>
