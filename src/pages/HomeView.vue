@@ -9,11 +9,6 @@ const router = useRouter();
 // Mengambil data user dari Telegram
 const userData = computed(() => initData.state()?.user);
 
-// Profile data dari backend
-const profileData = ref<ProfileResponse | null>(null);
-const profileError = ref<string | null>(null);
-const isLoading = ref(false);
-
 onMounted(async () => {
   // Expand viewport jika tersedia
   if (viewport.mount.isAvailable()) {
